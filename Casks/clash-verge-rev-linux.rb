@@ -66,7 +66,7 @@ cask "clash-verge-rev-linux" do
       "1. Grant capabilities (once per install/upgrade):",
       "   sudo setcap cap_net_admin+ep $(readlink -f $(brew --prefix)/bin/verge-mihomo)",
       "",
-      "2. Create service directory:",
+      "2. Create service directory if not existing:",
       "mkdir -p ~/.config/systemd/user",
       "",
       "3. Save the following content as:",
