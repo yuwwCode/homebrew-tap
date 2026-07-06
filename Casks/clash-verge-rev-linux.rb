@@ -23,10 +23,8 @@ cask "clash-verge-rev-linux" do
   binary "usr/bin/clash-verge-service-uninstall"
   binary "usr/bin/verge-mihomo"
   binary "usr/bin/verge-mihomo-alpha"
-
   artifact "usr/share/applications/Clash Verge.desktop",
            target: "#{Dir.home}/.local/share/applications/clash-verge.desktop"
-
   artifact "usr/share/icons/hicolor/32x32/apps/clash-verge.png",
            target: "#{Dir.home}/.local/share/icons/hicolor/32x32/apps/clash-verge.png"
   artifact "usr/share/icons/hicolor/128x128/apps/clash-verge.png",
@@ -42,8 +40,8 @@ cask "clash-verge-rev-linux" do
   zap trash: [
     "~/.config/clash-verge",
     "~/.local/share/applications/clash-verge.desktop",
-    "~/.local/share/icons/hicolor/32x32/apps/clash-verge.png",
     "~/.local/share/icons/hicolor/128x128/apps/clash-verge.png",
     "~/.local/share/icons/hicolor/256x256@2/apps/clash-verge.png",
+    "~/.local/share/icons/hicolor/32x32/apps/clash-verge.png",
   ]
 end
