@@ -49,6 +49,8 @@ cask "clash-verge-rev-linux" do
       FileUtils.mkdir_p(File.dirname(dst))
       FileUtils.cp(src, dst) if File.exist?(src)
     end
+
+    system "setcap", "cap_net_admin+ep", "#{staged_path}/usr/bin/verge-mihomo"
   end
 
   zap trash: [
