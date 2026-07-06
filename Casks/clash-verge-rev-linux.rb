@@ -23,18 +23,25 @@ cask "clash-verge-rev-linux" do
   binary "usr/bin/clash-verge-service-uninstall"
   binary "usr/bin/verge-mihomo"
   binary "usr/bin/verge-mihomo-alpha"
-  artifact "usr/share/applications/Clash Verge.desktop",
-           target: "#{Dir.home}/.local/share/applications/clash-verge.desktop"
-  artifact "usr/share/icons/hicolor/32x32/apps/clash-verge.png",
-           target: "#{Dir.home}/.local/share/icons/hicolor/32x32/apps/clash-verge.png"
-  artifact "usr/share/icons/hicolor/128x128/apps/clash-verge.png",
-           target: "#{Dir.home}/.local/share/icons/hicolor/128x128/apps/clash-verge.png"
-  artifact "usr/share/icons/hicolor/256x256@2/apps/clash-verge.png",
-           target: "#{Dir.home}/.local/share/icons/hicolor/256x256@2/apps/clash-verge.png"
 
   preflight do
     FileUtils.mkdir_p "#{Dir.home}/.local/share/applications"
     FileUtils.mkdir_p "#{Dir.home}/.local/share/icons"
+  end
+
+  postflight do
+    desktop_source = "#{staged_path}/usr/share/applications/Clash Verge.desktop"
+    if File.exist?(desktop_source)
+      FileUtils.cp(desktop_source, "#{Dir.home}/.local/share/applications/clash-verge.desktop")
+    end
+
+    icons_dir = "#{staged_path}/usr/share/icons/hicolor"
+    %w[32x32 128x128 256x256@2].each do |size|
+      src = "#{icons_dir}/#{size}/apps/clash-verge.png"
+      dst = "#{Dir.home}/.local/share/icons/hicolor/#{size}/apps/clash-verge.png"
+      FileUtils.mkdir_p(File.dirname(dst))
+      FileUtils.cp(src, dst) if File.exist?(src)
+    end
   end
 
   zap trash: [
