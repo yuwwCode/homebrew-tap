@@ -49,26 +49,10 @@ cask "clash-verge-rev-linux" do
       FileUtils.mkdir_p(File.dirname(dst))
       FileUtils.cp(src, dst) if File.exist?(src)
     end
-  end
 
-  zap trash: [
-    "~/.config/clash-verge",
-    "~/.local/share/applications/clash-verge.desktop",
-    "~/.local/share/icons/hicolor/128x128/apps/clash-verge.png",
-    "~/.local/share/icons/hicolor/256x256@2/apps/clash-verge.png",
-    "~/.local/share/icons/hicolor/32x32/apps/clash-verge.png",
-  ]
-
-  caveats do
-    <<~EOS
-      TUN virtual network adapter support requires manual setup:
-
-      1. Grant capabilities (once per install/upgrade):
-         sudo setcap cap_net_admin+ep $(readlink -f $(brew --prefix)/bin/verge-mihomo)
-
-      2. Register user-level systemd service (once):
-         mkdir -p ~/.config/systemd/user
-         cat > ~/.config/systemd/user/clash-verge-service.service << 'EOF'
+    service_dir = "#{Dir.home}/.config/systemd/user"
+    FileUtils.mkdir_p service_dir
+    File.write "#{service_dir}/clash-verge-service.service", <<~SERVICE
       [Unit]
       Description=Clash Verge Service
       After=network-online.target
@@ -81,9 +65,29 @@ cask "clash-verge-rev-linux" do
 
       [Install]
       WantedBy=default.target
-      EOF
-         systemctl --user daemon-reload
-         systemctl --user enable --now clash-verge-service
+    SERVICE
+    system "systemctl", "--user", "daemon-reload"
+    system "systemctl", "--user", "enable", "--now", "clash-verge-service"
+  end
+
+  uninstall_preflight do
+    system "systemctl", "--user", "disable", "--now", "clash-verge-service"
+    FileUtils.rm "#{Dir.home}/.config/systemd/user/clash-verge-service.service"
+    system "systemctl", "--user", "daemon-reload"
+  end
+
+  zap trash: [
+    "~/.config/clash-verge",
+    "~/.local/share/applications/clash-verge.desktop",
+    "~/.local/share/icons/hicolor/128x128/apps/clash-verge.png",
+    "~/.local/share/icons/hicolor/256x256@2/apps/clash-verge.png",
+    "~/.local/share/icons/hicolor/32x32/apps/clash-verge.png",
+  ]
+
+  caveats do
+    <<~EOS
+      TUN virtual network adapter support requires:
+        sudo setcap cap_net_admin+ep $(readlink -f $(brew --prefix)/bin/verge-mihomo)
     EOS
   end
 end
