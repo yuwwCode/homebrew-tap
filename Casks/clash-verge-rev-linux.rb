@@ -25,6 +25,13 @@ cask "clash-verge-rev-linux" do
   binary "usr/bin/verge-mihomo-alpha"
 
   preflight do
+    deb_file = Dir.glob("#{staged_path}/*.deb").first
+    if deb_file
+      system "ar", "x", deb_file, "data.tar.gz", chdir: staged_path.to_s
+      system "tar", "xzf", "#{staged_path}/data.tar.gz", "-C", staged_path.to_s
+      FileUtils.rm "#{staged_path}/data.tar.gz"
+    end
+
     FileUtils.mkdir_p "#{Dir.home}/.local/share/applications"
     FileUtils.mkdir_p "#{Dir.home}/.local/share/icons"
   end
