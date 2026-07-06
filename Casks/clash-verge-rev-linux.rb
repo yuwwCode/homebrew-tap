@@ -49,8 +49,6 @@ cask "clash-verge-rev-linux" do
       FileUtils.mkdir_p(File.dirname(dst))
       FileUtils.cp(src, dst) if File.exist?(src)
     end
-
-    system "setcap", "cap_net_admin+ep", "#{staged_path}/usr/bin/verge-mihomo"
   end
 
   zap trash: [
@@ -60,4 +58,32 @@ cask "clash-verge-rev-linux" do
     "~/.local/share/icons/hicolor/256x256@2/apps/clash-verge.png",
     "~/.local/share/icons/hicolor/32x32/apps/clash-verge.png",
   ]
+
+  caveats do
+    <<~EOS
+      TUN virtual network adapter support requires manual setup:
+
+      1. Grant capabilities (once per install/upgrade):
+         sudo setcap cap_net_admin+ep $(readlink -f $(brew --prefix)/bin/verge-mihomo)
+
+      2. Register user-level systemd service (once):
+         mkdir -p ~/.config/systemd/user
+         cat > ~/.config/systemd/user/clash-verge-service.service << 'EOF'
+      [Unit]
+      Description=Clash Verge Service
+      After=network-online.target
+
+      [Service]
+      Type=simple
+      ExecStart=#{HOMEBREW_PREFIX}/bin/clash-verge-service
+      Restart=always
+      RestartSec=5
+
+      [Install]
+      WantedBy=default.target
+      EOF
+         systemctl --user daemon-reload
+         systemctl --user enable --now clash-verge-service
+    EOS
+  end
 end
