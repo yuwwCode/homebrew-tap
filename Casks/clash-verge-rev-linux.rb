@@ -60,30 +60,32 @@ cask "clash-verge-rev-linux" do
   ]
 
   caveats do
-    <<~EOS
-      TUN virtual network adapter support requires manual setup:
-
-      1. Grant capabilities (once per install/upgrade):
-         sudo setcap cap_net_admin+ep $(readlink -f $(brew --prefix)/bin/verge-mihomo)
-
-      2. Register user-level systemd service (once):
-         mkdir -p ~/.config/systemd/user
-         cat > ~/.config/systemd/user/clash-verge-service.service << 'EOF'
-      [Unit]
-      Description=Clash Verge Service
-      After=network-online.target
-
-      [Service]
-      Type=simple
-      ExecStart=#{HOMEBREW_PREFIX}/bin/clash-verge-service
-      Restart=always
-      RestartSec=5
-
-      [Install]
-      WantedBy=default.target
-      EOF
-         systemctl --user daemon-reload
-         systemctl --user enable --now clash-verge-service
-    EOS
+    [
+      "TUN virtual network adapter support requires manual setup:",
+      "",
+      "1. Grant capabilities (once per install/upgrade):",
+      "   sudo setcap cap_net_admin+ep $(readlink -f $(brew --prefix)/bin/verge-mihomo)",
+      "",
+      "2. Create service directory and file:",
+      "mkdir -p ~/.config/systemd/user",
+      "cat > ~/.config/systemd/user/clash-verge-service.service << 'EOF'",
+      "[Unit]",
+      "Description=Clash Verge Service",
+      "After=network-online.target",
+      "",
+      "[Service]",
+      "Type=simple",
+      "ExecStart=#{HOMEBREW_PREFIX}/bin/clash-verge-service",
+      "Restart=always",
+      "RestartSec=5",
+      "",
+      "[Install]",
+      "WantedBy=default.target",
+      "EOF",
+      "",
+      "3. Enable and start the service:",
+      "systemctl --user daemon-reload",
+      "systemctl --user enable --now clash-verge-service",
+    ].join("\n")
   end
 end
